@@ -77,10 +77,9 @@ extension ViewController: CLLocationManagerDelegate {
                 guard let forecastData = data else {
                     return errorHandling(error: .failGetData)
                 }
-                do {
-                    forecastList = try JSONDecoder().decode(ForecastList.self, from: forecastData)
-                } catch {
-                    errorHandling(error: .failDecode)
+                forecastList = try? JSONDecoder().decode(ForecastList.self, from: forecastData)
+                DispatchQueue.main.async {
+                    weatherTableView.reloadSections(IndexSet(integer: 1), with: .none)
                 }
             case .failure(let error):
                 errorHandling(error: error)
@@ -93,10 +92,9 @@ extension ViewController: CLLocationManagerDelegate {
                 guard let currentData = data else {
                     return errorHandling(error: .failGetData)
                 }
-                do {
-                    currentWeather = try JSONDecoder().decode(CurrentWeather.self, from: currentData)
-                } catch {
-                    errorHandling(error: .failDecode)
+                currentWeather = try? JSONDecoder().decode(CurrentWeather.self, from: currentData)
+                DispatchQueue.main.async {
+                    weatherTableView.reloadSections(IndexSet(integer: 0), with: .none)
                 }
             case .failure(let error):
                 errorHandling(error: error)
@@ -134,10 +132,7 @@ extension ViewController: UITableViewDataSource {
         case 0:
             return 1
         default:
-            guard let numberOfRow = forecastList?.count else {
-                return 40
-            }
-            return numberOfRow
+            return forecastList?.count ?? 0
         }
     }
     
